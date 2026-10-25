@@ -990,6 +990,9 @@ export function renderBookingView(container) {
   const btnConfirmPlanChoice = container.querySelector('#btn-confirm-plan-choice')
 
   function getEffectivePrice() {
+    if (selectedService?.slug === 'foto-navidena') {
+      return selectedPlan?.price ?? null
+    }
     if (selectedPlan && selectedPlan.price) return selectedPlan.price
     if (selectedService && selectedService.price) return selectedService.price
     return null
@@ -1167,7 +1170,10 @@ export function renderBookingView(container) {
         const isSelected = selectedService?.slug === srv.slug
         const isNavidad = srv.slug === 'foto-navidena' || srv.is_featured
         const cfg = getPlansConfigForService(srv)
-        const minPrice = cfg.plans?.[0]?.price || srv.price
+        const minPrice =
+          srv.slug === 'foto-navidena'
+            ? cfg.plans?.[0]?.price ?? null
+            : cfg.plans?.[0]?.price || srv.price
         const plansCount = cfg.plans?.length || 2
 
         return `
@@ -1214,9 +1220,11 @@ export function renderBookingView(container) {
                       selectedPlan.price
                     )}</span>
                      <span class="text-[11px] text-[#E3B8D0] font-medium">${selectedPlan.name} • Cambiar →</span>`
-                  : `<span class="font-mono-code text-xs text-[#E3B8D0] font-medium">Desde ${formatPriceSlot(
-                      minPrice
-                    )}</span>
+                  : `<span class="font-mono-code text-xs text-[#E3B8D0] font-medium">${
+                      minPrice && Number(minPrice) > 0
+                        ? `Desde ${formatPriceSlot(minPrice)}`
+                        : formatPriceSlot(null)
+                    }</span>
                      <span class="text-[11px] text-[#c9a3b1] group-hover:text-[#f7f5f4] transition-colors">Ver planes →</span>`
               }
             </div>

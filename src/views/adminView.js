@@ -557,7 +557,8 @@ function renderAdminDashboard(container) {
               <div>
                 <label class="block text-[#f7f5f4] font-medium mb-1.5">Tipo de sesión y plan *</label>
                 <select name="service_name" class="iso-input cursor-pointer">
-                  <option value="Foto Navideña — Plan Temporada">Foto Navideña — Plan Temporada (RD$ 3,500)</option>
+                  <option value="Foto Navideña — Plan Estándar Navideño">Foto Navideña — Plan Estándar (Precio por confirmar)</option>
+                  <option value="Foto Navideña — Plan Premium Navideño">Foto Navideña — Plan Premium (Precio por confirmar)</option>
                   <option value="Infantil — Plan Estándar">Infantil (Niños) — Plan Estándar (RD$ 1,900)</option>
                   <option value="Infantil — Plan Premium">Infantil (Niños) — Plan Premium (RD$ 3,200)</option>
                   <option value="Retrato — Plan Básico">Retrato — Plan Básico (RD$ 1,600)</option>
