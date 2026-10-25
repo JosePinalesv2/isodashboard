@@ -307,7 +307,7 @@ function renderAdminDashboard(container) {
               4. Sesiones y Precios
             </span>
             <span class="font-serif-editorial text-2xl text-[#c9a3b1] font-semibold">
-              6
+              3
             </span>
           </div>
           <p class="text-xs text-[#c9a3b1] mt-3 leading-relaxed">
@@ -555,14 +555,14 @@ function renderAdminDashboard(container) {
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label class="block text-[#f7f5f4] font-medium mb-1.5">Tipo de sesión *</label>
+                <label class="block text-[#f7f5f4] font-medium mb-1.5">Tipo de sesión y plan *</label>
                 <select name="service_name" class="iso-input cursor-pointer">
-                  <option value="Foto Navideña">Foto Navideña</option>
-                  <option value="Maternidad">Maternidad</option>
-                  <option value="Infantil">Infantil</option>
-                  <option value="Retrato">Retrato</option>
-                  <option value="Corporativa">Corporativa</option>
-                  <option value="Familia">Familia</option>
+                  <option value="Foto Navideña — Plan Temporada">Foto Navideña — Plan Temporada (RD$ 3,500)</option>
+                  <option value="Infantil — Plan Estándar">Infantil (Niños) — Plan Estándar (RD$ 1,900)</option>
+                  <option value="Infantil — Plan Premium">Infantil (Niños) — Plan Premium (RD$ 3,200)</option>
+                  <option value="Retrato — Plan Básico">Retrato — Plan Básico (RD$ 1,600)</option>
+                  <option value="Retrato — Plan Estándar">Retrato — Plan Estándar (RD$ 2,800)</option>
+                  <option value="Retrato — Plan Premium">Retrato — Plan Premium (RD$ 4,800)</option>
                 </select>
               </div>
               <div>
@@ -589,7 +589,7 @@ function renderAdminDashboard(container) {
               </div>
               <div>
                 <label class="block text-[#f7f5f4] font-medium mb-1.5">Hora *</label>
-                <input type="time" name="appointment_time" value="10:00" required class="iso-input font-mono-code" />
+                <input type="time" name="appointment_time" value="17:00" required class="iso-input font-mono-code" />
               </div>
               <div>
                 <label class="block text-[#f7f5f4] font-medium mb-1.5">¿Dónde guardarla?</label>
@@ -599,6 +599,9 @@ function renderAdminDashboard(container) {
                 </select>
               </div>
             </div>
+            <p class="text-[11px] text-[#c9a3b1]">
+              Horario del estudio: <strong class="text-[#f7f5f4]">Lunes a Viernes 5:00 PM – 8:00 PM</strong> | <strong class="text-[#E3B8D0]">Domingos 8:00 AM – 5:00 PM</strong>
+            </p>
 
             <div class="pt-4 border-t border-[#f7f5f4]/10 flex justify-end gap-3">
               <button type="button" id="btn-cancel-manual" class="btn-iso-secondary px-4 py-2 text-xs cursor-pointer">
@@ -1607,7 +1610,9 @@ function renderAdminDashboard(container) {
       appointments = appRes.data
     }
     if (!srvRes.error && Array.isArray(srvRes.data)) {
-      services = srvRes.data
+      services = srvRes.data.filter((s) =>
+        ['foto-navidena', 'infantil', 'retrato'].includes(s.slug)
+      )
     }
 
     renderActiveTab()

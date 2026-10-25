@@ -12,8 +12,11 @@ import {
   compressReceiptImage,
   serializeClientMeta,
   BANK_ACCOUNTS_INFO,
+  getPlansConfigForService,
 } from '../utils/formatters'
 import { printBookingTicket } from '../utils/exportUtils'
+
+const ALLOWED_SERVICE_SLUGS = ['foto-navidena', 'infantil', 'retrato']
 
 const DEFAULT_SERVICES = [
   {
@@ -26,17 +29,6 @@ const DEFAULT_SERVICES = [
     price: null,
     description: 'Sesión especial de temporada navideña en set decorado de estudio.',
     is_featured: true,
-  },
-  {
-    id: 2,
-    slug: 'maternidad',
-    name: 'Maternidad',
-    category: 'Estudio',
-    duration_minutes: 60,
-    grace_minutes: 25,
-    price: null,
-    description: 'Sesión artística de maternidad con iluminación cálida y dirección de pose.',
-    is_featured: false,
   },
   {
     id: 3,
@@ -60,41 +52,67 @@ const DEFAULT_SERVICES = [
     description: 'Sesión individual de retrato editorial, cumpleaños o fine art.',
     is_featured: false,
   },
-  {
-    id: 5,
-    slug: 'corporativa',
-    name: 'Corporativa',
-    category: 'Corporativa',
-    duration_minutes: 45,
-    grace_minutes: 20,
-    price: null,
-    description: 'Fotografía ejecutiva y de marca personal para profesionales.',
-    is_featured: false,
-  },
-  {
-    id: 6,
-    slug: 'familia',
-    name: 'Familia',
-    category: 'Estudio',
-    duration_minutes: 60,
-    grace_minutes: 30,
-    price: null,
-    description: 'Sesión grupal familiar para conservar un recuerdo atemporal.',
-    is_featured: false,
-  },
 ]
 
-const TIME_SLOTS = [
+// Horario oficial de ISO Estudio:
+// • Lunes a Viernes: 5:00 PM a 8:00 PM
+// • Domingos: 8:00 AM a 5:00 PM
+const WEEKDAY_SLOTS = ['17:00', '18:00', '19:00', '20:00']
+const SUNDAY_SLOTS = [
+  '08:00',
   '09:00',
   '10:00',
   '11:00',
   '12:00',
+  '13:00',
   '14:00',
   '15:00',
   '16:00',
   '17:00',
-  '18:00',
 ]
+
+function getScheduleForDate(dateStr) {
+  if (!dateStr) {
+    return {
+      isOpen: true,
+      scheduleLabel: 'Lunes a Viernes (5:00 PM – 8:00 PM)',
+      slots: WEEKDAY_SLOTS,
+    }
+  }
+  const [y, m, d] = dateStr.split('-').map(Number)
+  const dayOfWeek = new Date(y, m - 1, d).getDay() // 0 = Domingo, 1..5 = Lun..Vie, 6 = Sábado
+
+  if (dayOfWeek === 0) {
+    return {
+      isOpen: true,
+      scheduleLabel: 'Horario de Domingo: 8:00 AM a 5:00 PM',
+      slots: SUNDAY_SLOTS,
+    }
+  }
+  if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+    return {
+      isOpen: true,
+      scheduleLabel: 'Horario Lunes a Viernes: 5:00 PM a 8:00 PM',
+      slots: WEEKDAY_SLOTS,
+    }
+  }
+  return {
+    isOpen: false,
+    scheduleLabel: 'Sábado sin servicio • Elige Lunes a Viernes o Domingo',
+    slots: [],
+  }
+}
+
+function getInitialOpenDateStr() {
+  const now = new Date()
+  if (now.getDay() === 6) {
+    now.setDate(now.getDate() + 1) // Si hoy es sábado, pasa automáticamente al domingo
+  }
+  const y = now.getFullYear()
+  const m = String(now.getMonth() + 1).padStart(2, '0')
+  const d = String(now.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
 
 const ISO_CAROUSEL_SLIDES = [
   { src: '/foto-navidena-bg.jpg', tag: 'Foto Navideña • Set de Temporada — ISO Estudio' },
@@ -117,7 +135,7 @@ const ISO_CAROUSEL_SLIDES = [
 export function renderBookingView(container) {
   let services = [...DEFAULT_SERVICES]
   let selectedService = services[0]
-  let selectedTime = '10:00'
+  let selectedPlan = getPlansConfigForService(selectedService).plans[0]
   let peopleCount = 2
   let pendingDraft = null
   let uploadedReceiptDataUrl = ''
@@ -126,7 +144,8 @@ export function renderBookingView(container) {
   let carouselTimer = null
 
   const todayStr = new Date().toISOString().split('T')[0]
-  let selectedDate = todayStr
+  let selectedDate = getInitialOpenDateStr()
+  let selectedTime = getScheduleForDate(selectedDate).slots[0] || '17:00'
 
   container.innerHTML = `
     <div class="relative min-h-[calc(100vh-4.5rem)] overflow-hidden">
@@ -243,7 +262,7 @@ export function renderBookingView(container) {
               <span class="text-[11px] text-[#c9a3b1]">Selecciona una opción</span>
             </div>
 
-            <div id="services-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+            <div id="services-grid" class="grid grid-cols-1 gap-3"></div>
           </section>
 
           <!-- PASO 2: Datos del Cliente + Correo Electrónico y Teléfono (+1) -->
@@ -359,23 +378,36 @@ export function renderBookingView(container) {
 
           <!-- PASO 3: Fecha y Hora de la Reserva -->
           <section class="iso-card p-5 sm:p-6 space-y-5">
-            <div class="border-b border-[#f7f5f4]/10 pb-3 flex items-center justify-between">
+            <div class="border-b border-[#f7f5f4]/10 pb-3 flex flex-wrap items-center justify-between gap-2">
               <span class="text-xs uppercase tracking-[0.16em] text-[#D795B7] font-semibold">
                 3. Fecha y hora de tu sesión
               </span>
               <span id="grace-inline-hint" class="text-[11px] text-[#E3B8D0] font-mono-code"></span>
             </div>
 
+            <!-- Aviso claro de los horarios de ISO Estudio -->
+            <div class="rounded-xl bg-[#0a0a0a]/75 border border-[#D795B7]/25 px-3.5 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
+              <span class="text-[#c9a3b1]">
+                <strong class="text-[#f7f5f4]">Lunes a Viernes:</strong> 5:00 PM a 8:00 PM
+              </span>
+              <span class="text-[#c9a3b1]">
+                <strong class="text-[#f7f5f4]">Domingos:</strong> 8:00 AM a 5:00 PM
+              </span>
+            </div>
+
             <div>
-              <label for="appointment_date" class="block text-xs font-medium text-[#f7f5f4] mb-1.5">
-                Selecciona el día <span class="text-[#D795B7]">*</span>
-              </label>
+              <div class="flex items-center justify-between mb-1.5">
+                <label for="appointment_date" class="block text-xs font-medium text-[#f7f5f4]">
+                  Selecciona el día <span class="text-[#D795B7]">*</span>
+                </label>
+                <span id="schedule-day-badge" class="text-[11px] text-[#E3B8D0] font-medium"></span>
+              </div>
               <input
                 type="date"
                 id="appointment_date"
                 name="appointment_date"
                 min="${todayStr}"
-                value="${todayStr}"
+                value="${selectedDate}"
                 required
                 class="iso-input font-mono-code cursor-pointer"
               />
@@ -383,9 +415,9 @@ export function renderBookingView(container) {
 
             <div>
               <label class="block text-xs font-medium text-[#f7f5f4] mb-2">
-                Selecciona la hora <span class="text-[#D795B7]">*</span>
+                Selecciona la hora disponible <span class="text-[#D795B7]">*</span>
               </label>
-              <div id="time-slots-grid" class="grid grid-cols-3 sm:grid-cols-3 gap-2.5"></div>
+              <div id="time-slots-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5"></div>
             </div>
           </section>
         </div>
@@ -462,6 +494,114 @@ export function renderBookingView(container) {
           </div>
         </aside>
       </form>
+
+      <!-- ================================================================== -->
+      <!-- MODAL 0: SELECCIÓN DE PLANES Y FONDO POR TIPO DE SESIÓN            -->
+      <!-- ================================================================== -->
+      <div
+        id="session-plan-modal"
+        class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="plan-modal-title"
+      >
+        <div
+          id="session-plan-modal-card"
+          class="relative overflow-hidden iso-card max-w-3xl w-full border border-[#D795B7]/50 max-h-[94vh] overflow-y-auto animate-view-enter shadow-2xl"
+        >
+          <!-- Imagen de Fondo del Modal (Destacada en Foto Navideña y sutil en las demás) -->
+          <div class="absolute inset-0 pointer-events-none select-none overflow-hidden z-0">
+            <img
+              id="plan-modal-bg-img"
+              src="/foto-navidena-bg.jpg"
+              alt=""
+              class="w-full h-full object-cover object-center transition-opacity duration-500"
+            />
+            <div
+              id="plan-modal-bg-overlay"
+              class="absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/65 via-[#141114]/82 to-[#0a0a0a]/95"
+            ></div>
+          </div>
+
+          <!-- Contenido del Modal sobre el Fondo -->
+          <div class="relative z-10 p-6 sm:p-8 space-y-6">
+            
+            <!-- Cabecera del Modal -->
+            <div class="flex items-start justify-between gap-4 border-b border-[#f7f5f4]/15 pb-4">
+              <div>
+                <span
+                  id="plan-modal-eyebrow"
+                  class="badge-grace bg-[#161014]/90 backdrop-blur-sm text-[10px] uppercase tracking-[0.2em] px-3 py-1 rounded-full font-semibold inline-block mb-2"
+                >
+                  Un momento, una historia, una foto • ISO Estudio
+                </span>
+                <h3 id="plan-modal-title" class="font-serif-editorial text-3xl sm:text-4xl text-[#f7f5f4] font-semibold drop-shadow">
+                  Planes Fotográficos
+                </h3>
+                <p id="plan-modal-subtitle" class="text-xs sm:text-sm text-[#E3B8D0] mt-1"></p>
+              </div>
+
+              <button
+                type="button"
+                id="btn-close-plan-modal"
+                aria-label="Cerrar selector de planes"
+                class="btn-iso-secondary w-9 h-9 flex items-center justify-center text-[#f7f5f4] shrink-0 cursor-pointer bg-[#141114]/85"
+              >
+                &times;
+              </button>
+            </div>
+
+            <!-- Galería / Vista Previa Visual de la Sesión dentro del Modal -->
+            <div class="relative rounded-2xl overflow-hidden border border-[#D795B7]/35 bg-[#0a0a0a]/80 shadow-xl">
+              <img
+                id="plan-modal-showcase-img"
+                src="/foto-navidena-bg.jpg"
+                alt="Vista previa de la sesión"
+                class="w-full h-48 sm:h-56 object-cover object-center"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/90 via-transparent to-transparent flex items-end justify-between p-4">
+                <span id="plan-modal-grace-pill" class="badge-arrived bg-[#0a0a0a]/85 backdrop-blur-sm text-[11px] font-mono-code px-3 py-1 rounded-full">
+                  +25 min de gracia incluidos
+                </span>
+                <a
+                  id="plan-modal-flyer-link"
+                  href="/planes/flyer-ninos-2planes.jpg"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn-iso-secondary bg-[#141114]/90 backdrop-blur-sm px-3.5 py-1.5 text-[11px] font-medium text-[#E3B8D0] hover:text-[#f7f5f4]"
+                >
+                  Ver afiche completo
+                </a>
+              </div>
+            </div>
+
+            <!-- Tarjetas de Selección de Plan (2 planes o 3 planes según la sesión) -->
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="text-xs uppercase tracking-[0.16em] text-[#D795B7] font-semibold">
+                  Selecciona el plan para tu sesión
+                </span>
+                <span class="text-[11px] text-[#c9a3b1]">Reserva con el 50%</span>
+              </div>
+
+              <div id="plan-modal-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+            </div>
+
+            <!-- Botón de Confirmación del Plan -->
+            <div class="pt-3 border-t border-[#f7f5f4]/15 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+              <p id="plan-modal-selected-summary" class="text-xs text-[#c9a3b1]"></p>
+              <button
+                type="button"
+                id="btn-confirm-plan-choice"
+                class="btn-iso-primary px-7 py-3 text-xs sm:text-sm font-medium cursor-pointer shrink-0"
+              >
+                Elegir este Plan y Continuar
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
 
       <!-- ================================================================== -->
       <!-- MODAL 1: PAGO DEL 50% VÍA TRANSFERENCIA + SUBIDA OBLIGATORIA       -->
@@ -835,57 +975,250 @@ export function renderBookingView(container) {
     resetReceiptUploadUI()
   })
 
+  // Modal 0: Selector de Planes y Vista Previa de Sesión
+  const sessionPlanModal = container.querySelector('#session-plan-modal')
+  const planModalBgImg = container.querySelector('#plan-modal-bg-img')
+  const planModalBgOverlay = container.querySelector('#plan-modal-bg-overlay')
+  const planModalTitle = container.querySelector('#plan-modal-title')
+  const planModalSubtitle = container.querySelector('#plan-modal-subtitle')
+  const planModalShowcaseImg = container.querySelector('#plan-modal-showcase-img')
+  const planModalGracePill = container.querySelector('#plan-modal-grace-pill')
+  const planModalFlyerLink = container.querySelector('#plan-modal-flyer-link')
+  const planModalCardsGrid = container.querySelector('#plan-modal-cards-grid')
+  const planModalSelectedSummary = container.querySelector('#plan-modal-selected-summary')
+  const btnClosePlanModal = container.querySelector('#btn-close-plan-modal')
+  const btnConfirmPlanChoice = container.querySelector('#btn-confirm-plan-choice')
+
+  function getEffectivePrice() {
+    if (selectedPlan && selectedPlan.price) return selectedPlan.price
+    if (selectedService && selectedService.price) return selectedService.price
+    return null
+  }
+
+  function renderPlanModalCards(service) {
+    if (!planModalCardsGrid) return
+    const cfg = getPlansConfigForService(service)
+    const plans = cfg.plans || []
+
+    // Si son 2 planes (ej. Infantil o Foto Navideña) usamos 2 columnas; si son 3 planes (Básico, Estándar, Premium) 3 columnas
+    planModalCardsGrid.className =
+      plans.length === 3
+        ? 'grid grid-cols-1 md:grid-cols-3 gap-4'
+        : 'grid grid-cols-1 sm:grid-cols-2 gap-4'
+
+    planModalCardsGrid.innerHTML = plans
+      .map((plan) => {
+        const isChosen = selectedPlan?.id === plan.id
+        return `
+          <div
+            data-plan-id="${plan.id}"
+            class="plan-choice-card rounded-2xl p-5 border transition cursor-pointer flex flex-col justify-between ${
+              isChosen
+                ? 'bg-[#1f151a]/95 border-[#D795B7] shadow-[0_0_0_1px_rgba(215,149,183,0.45)]'
+                : 'bg-[#141114]/90 border-[#f7f5f4]/12 hover:border-[#D795B7]/50 hover:bg-[#1f151a]/80'
+            }"
+          >
+            <div class="space-y-3">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <span class="text-[10px] uppercase tracking-[0.16em] text-[#E3B8D0] font-semibold block">
+                    ${plan.badge || 'Plan ISO Estudio'}
+                  </span>
+                  <h4 class="font-serif-editorial text-2xl text-[#f7f5f4] font-semibold mt-0.5">
+                    ${plan.name}
+                  </h4>
+                </div>
+                <span class="w-5 h-5 rounded-full border ${
+                  isChosen ? 'border-[#D795B7] bg-[#D795B7]' : 'border-[#f7f5f4]/30'
+                } flex items-center justify-center shrink-0 mt-1">
+                  ${
+                    isChosen
+                      ? '<svg class="w-3 h-3 text-[#0a0a0a]" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>'
+                      : ''
+                  }
+                </span>
+              </div>
+
+              <ul class="space-y-1.5 text-xs text-[#c9a3b1] pt-1 border-t border-[#f7f5f4]/10">
+                ${plan.features
+                  .map(
+                    (feat) => `
+                  <li class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#D795B7] shrink-0"></span>
+                    <span class="text-[#f7f5f4]/90">${feat}</span>
+                  </li>
+                `
+                  )
+                  .join('')}
+              </ul>
+            </div>
+
+            <div class="mt-5 pt-3 border-t border-[#f7f5f4]/10 flex items-end justify-between">
+              <div>
+                <span class="text-[10px] uppercase tracking-wider text-[#c9a3b1] block">Inversión total</span>
+                <strong class="font-mono-code text-xl text-[#f7f5f4] font-semibold">
+                  ${formatPriceSlot(plan.price)}
+                </strong>
+              </div>
+              <div class="text-right">
+                <span class="text-[10px] uppercase tracking-wider text-[#E3B8D0] block">Reserva con 50%</span>
+                <strong class="font-mono-code text-xs text-[#86efac]">
+                  ${formatDeposit50(plan.price)}
+                </strong>
+              </div>
+            </div>
+          </div>
+        `
+      })
+      .join('')
+
+    if (planModalSelectedSummary && selectedPlan) {
+      planModalSelectedSummary.innerHTML = `Seleccionado: <strong class="text-[#f7f5f4]">${service.name} — ${selectedPlan.name}</strong> (<strong class="text-[#E3B8D0]">${formatPriceSlot(selectedPlan.price)}</strong> • Abono 50%: <strong class="text-[#86efac]">${formatDeposit50(selectedPlan.price)}</strong>)`
+    }
+
+    planModalCardsGrid.querySelectorAll('.plan-choice-card').forEach((card) => {
+      card.addEventListener('click', () => {
+        const planId = card.getAttribute('data-plan-id')
+        const foundPlan = plans.find((p) => p.id === planId)
+        if (foundPlan) {
+          selectedPlan = foundPlan
+          renderPlanModalCards(service)
+          renderServices()
+          updateSummary()
+        }
+      })
+    })
+  }
+
+  function openSessionPlanModal(service) {
+    if (!service || !sessionPlanModal) return
+    const cfg = getPlansConfigForService(service)
+
+    // Si el plan actual no pertenece a esta sesión, seleccionamos el primer plan por defecto
+    if (!selectedPlan || !cfg.plans.some((p) => p.id === selectedPlan.id)) {
+      selectedPlan = cfg.plans[0]
+    }
+
+    if (planModalTitle) {
+      planModalTitle.textContent =
+        service.slug === 'infantil'
+          ? 'Planes Fotográficos para Niños (Infantil)'
+          : `Planes — ${service.name}`
+    }
+    if (planModalSubtitle) planModalSubtitle.textContent = cfg.subtitle
+
+    // En Foto Navideña la foto del set navideño es protagonista en el fondo del modal
+    if (planModalBgImg) {
+      planModalBgImg.src = cfg.modalBgImage
+      planModalBgImg.className = cfg.isFullModalBg
+        ? 'w-full h-full object-cover object-center opacity-55 transition-opacity duration-500'
+        : 'w-full h-full object-cover object-center opacity-25 blur-[3px] transition-opacity duration-500'
+    }
+    if (planModalBgOverlay) {
+      planModalBgOverlay.className = cfg.isFullModalBg
+        ? 'absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/55 via-[#141114]/75 to-[#0a0a0a]/95'
+        : 'absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/80 via-[#141114]/88 to-[#0a0a0a]/96'
+    }
+
+    if (planModalShowcaseImg) {
+      planModalShowcaseImg.src = cfg.headerImage
+      planModalShowcaseImg.className =
+        service.slug === 'foto-navidena'
+          ? 'w-full h-56 sm:h-64 object-cover object-center'
+          : 'w-full h-48 sm:h-56 object-cover object-center'
+    }
+    if (planModalGracePill) {
+      planModalGracePill.textContent = `+${service.grace_minutes || 25} min de gracia incluidos`
+    }
+    if (planModalFlyerLink) {
+      planModalFlyerLink.href = cfg.flyerUrl
+      planModalFlyerLink.textContent =
+        service.slug === 'foto-navidena' ? 'Ver foto del set navideño' : 'Ver afiche de precios'
+    }
+
+    renderPlanModalCards(service)
+    sessionPlanModal.classList.remove('hidden')
+  }
+
+  btnClosePlanModal?.addEventListener('click', () => {
+    sessionPlanModal?.classList.add('hidden')
+  })
+
+  btnConfirmPlanChoice?.addEventListener('click', () => {
+    sessionPlanModal?.classList.add('hidden')
+    renderServices()
+    updateSummary()
+    showToast(
+      `Elegiste ${selectedService.name} — ${selectedPlan.name} (${formatPriceSlot(selectedPlan.price)})`,
+      'success'
+    )
+  })
+
+  sessionPlanModal?.addEventListener('click', (e) => {
+    if (e.target === sessionPlanModal) {
+      sessionPlanModal.classList.add('hidden')
+    }
+  })
+
   function renderServices() {
     if (!servicesGrid) return
     servicesGrid.innerHTML = services
       .map((srv) => {
         const isSelected = selectedService?.slug === srv.slug
         const isNavidad = srv.slug === 'foto-navidena' || srv.is_featured
+        const cfg = getPlansConfigForService(srv)
+        const minPrice = cfg.plans?.[0]?.price || srv.price
+        const plansCount = cfg.plans?.length || 2
+
         return `
           <button
             type="button"
             data-service-slug="${srv.slug}"
-            class="service-option group relative overflow-hidden text-left p-4 rounded-xl border transition cursor-pointer flex flex-col justify-between min-h-[116px] ${
+            class="service-option group w-full overflow-hidden text-left px-5 py-4 rounded-xl border transition cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
               isSelected
-                ? 'bg-[#1f151a] border-[#D795B7] shadow-[0_0_0_1px_rgba(215,149,183,0.45)]'
-                : 'bg-[#141114] border-[#f7f5f4]/10 hover:border-[#D795B7]/40'
+                ? 'bg-[#1f151a] border-[#D795B7] shadow-[0_0_0_1px_rgba(215,149,183,0.35)]'
+                : 'bg-[#141114] border-[#f7f5f4]/10 hover:border-[#D795B7]/40 hover:bg-[#1f151a]/60'
             }"
           >
-            ${
-              isNavidad
-                ? `
-                <img
-                  src="/foto-navidena-bg.jpg"
-                  alt=""
-                  aria-hidden="true"
-                  class="absolute inset-0 w-full h-full object-cover object-center opacity-55 transition-transform duration-500 group-hover:scale-105 pointer-events-none"
-                />
-                <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/95 via-[#141114]/70 to-[#0a0a0a]/45 pointer-events-none"></div>
-              `
-                : ''
-            }
-
-            <div class="relative z-10 flex items-start justify-between gap-2 w-full">
-              <div>
-                <span class="font-serif-editorial text-lg font-semibold text-[#f7f5f4] block leading-snug drop-shadow-sm">
-                  ${srv.name}
-                </span>
-                <span class="text-[11px] ${isNavidad ? 'text-[#f7f5f4]/90' : 'text-[#c9a3b1]'} block mt-0.5">
-                  +${srv.grace_minutes || 25} min de gracia
+            <div class="flex items-center gap-3.5 min-w-0">
+              <span class="w-4 h-4 rounded-full border ${
+                isSelected ? 'border-[#D795B7] bg-[#D795B7]' : 'border-[#f7f5f4]/30'
+              } flex items-center justify-center shrink-0">
+                ${
+                  isSelected
+                    ? '<svg class="w-2.5 h-2.5 text-[#0a0a0a]" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>'
+                    : ''
+                }
+              </span>
+              <div class="min-w-0">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="font-serif-editorial text-xl font-semibold text-[#f7f5f4] leading-snug">
+                    ${srv.slug === 'infantil' ? 'Infantil (Niños)' : srv.name}
+                  </span>
+                  ${
+                    isNavidad
+                      ? `<span class="badge-grace text-[9px] uppercase tracking-wider px-2.5 py-0.5 rounded-full font-semibold shrink-0">Temporada</span>`
+                      : ''
+                  }
+                </div>
+                <span class="text-xs text-[#c9a3b1] block mt-0.5">
+                  +${srv.grace_minutes || 25} min de gracia • ${plansCount} planes disponibles
                 </span>
               </div>
-              ${
-                isNavidad
-                  ? `<span class="badge-grace bg-[#161014]/85 backdrop-blur-sm text-[9px] uppercase tracking-wider px-2.5 py-0.5 rounded-full font-semibold shrink-0">Temporada</span>`
-                  : `<span class="w-4 h-4 rounded-full border ${
-                      isSelected ? 'border-[#D795B7] bg-[#D795B7]' : 'border-[#f7f5f4]/25'
-                    } flex items-center justify-center shrink-0 mt-1"></span>`
-              }
             </div>
 
-            <div class="relative z-10 mt-3 pt-2 border-t border-[#f7f5f4]/15 flex items-center justify-between w-full text-[11px]">
-              <span class="${isNavidad ? 'text-[#f7f5f4]/85' : 'text-[#c9a3b1]'}">Tarifa:</span>
-              <span class="font-mono-code text-[#E3B8D0] font-medium">${formatPriceSlot(srv.price)}</span>
+            <div class="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-1 pt-2.5 sm:pt-0 border-t sm:border-t-0 border-[#f7f5f4]/10 shrink-0">
+              ${
+                isSelected && selectedPlan
+                  ? `<span class="font-mono-code text-sm text-[#f7f5f4] font-semibold">${formatPriceSlot(
+                      selectedPlan.price
+                    )}</span>
+                     <span class="text-[11px] text-[#E3B8D0] font-medium">${selectedPlan.name} • Cambiar →</span>`
+                  : `<span class="font-mono-code text-xs text-[#E3B8D0] font-medium">Desde ${formatPriceSlot(
+                      minPrice
+                    )}</span>
+                     <span class="text-[11px] text-[#c9a3b1] group-hover:text-[#f7f5f4] transition-colors">Ver planes →</span>`
+              }
             </div>
           </button>
         `
@@ -897,13 +1230,18 @@ export function renderBookingView(container) {
         const slug = btn.getAttribute('data-service-slug')
         const found = services.find((s) => s.slug === slug)
         if (found) {
+          const isSwitchingService = selectedService?.slug !== found.slug
           selectedService = found
+          if (isSwitchingService) {
+            selectedPlan = getPlansConfigForService(found).plans[0]
+          }
           if (found.slug === 'foto-navidena' || found.is_featured) {
             goToSlide(0)
             resetCarouselTimer()
           }
           renderServices()
           updateSummary()
+          openSessionPlanModal(found)
         }
       })
     })
@@ -911,9 +1249,63 @@ export function renderBookingView(container) {
 
   function renderTimeSlots() {
     if (!timeSlotsGrid) return
-    timeSlotsGrid.innerHTML = TIME_SLOTS.map((slot) => {
-      const active = selectedTime === slot
-      return `
+    const schedule = getScheduleForDate(selectedDate)
+    const scheduleBadge = container.querySelector('#schedule-day-badge')
+    if (scheduleBadge) {
+      scheduleBadge.textContent = schedule.scheduleLabel
+      scheduleBadge.className = schedule.isOpen
+        ? 'text-[11px] text-[#E3B8D0] font-medium'
+        : 'text-[11px] text-[#fda4af] font-medium'
+    }
+
+    if (!schedule.isOpen) {
+      timeSlotsGrid.className = 'grid grid-cols-1'
+      timeSlotsGrid.innerHTML = `
+        <div class="rounded-xl bg-[#141114] border border-[#fda4af]/35 p-4 text-center space-y-2.5">
+          <p class="text-xs text-[#fda4af] font-medium">
+            Los sábados el estudio permanece cerrado.
+          </p>
+          <p class="text-[11px] text-[#c9a3b1]">
+            Nuestro horario de atención es de <strong class="text-[#f7f5f4]">Lunes a Viernes (5:00 PM a 8:00 PM)</strong> y <strong class="text-[#f7f5f4]">Domingos (8:00 AM a 5:00 PM)</strong>.
+          </p>
+          <button
+            type="button"
+            id="btn-jump-sunday"
+            class="btn-iso-primary px-4 py-2 text-xs font-medium cursor-pointer inline-flex items-center gap-1.5"
+          >
+            <span>Pasar al Domingo siguiente (8:00 AM – 5:00 PM)</span>
+          </button>
+        </div>
+      `
+      timeSlotsGrid.querySelector('#btn-jump-sunday')?.addEventListener('click', () => {
+        const [y, m, d] = selectedDate.split('-').map(Number)
+        const nextDay = new Date(y, m - 1, d + 1)
+        const ny = nextDay.getFullYear()
+        const nm = String(nextDay.getMonth() + 1).padStart(2, '0')
+        const nd = String(nextDay.getDate()).padStart(2, '0')
+        selectedDate = `${ny}-${nm}-${nd}`
+        if (inputDate) inputDate.value = selectedDate
+        const nextSched = getScheduleForDate(selectedDate)
+        selectedTime = nextSched.slots[0] || '08:00'
+        renderTimeSlots()
+        updateSummary()
+      })
+      return
+    }
+
+    if (!schedule.slots.includes(selectedTime)) {
+      selectedTime = schedule.slots[0]
+    }
+
+    timeSlotsGrid.className =
+      schedule.slots.length <= 4
+        ? 'grid grid-cols-2 sm:grid-cols-4 gap-2.5'
+        : 'grid grid-cols-2 sm:grid-cols-5 gap-2.5'
+
+    timeSlotsGrid.innerHTML = schedule.slots
+      .map((slot) => {
+        const active = selectedTime === slot
+        return `
         <button
           type="button"
           data-time="${slot}"
@@ -926,11 +1318,12 @@ export function renderBookingView(container) {
           ${formatTime12h(slot)}
         </button>
       `
-    }).join('')
+      })
+      .join('')
 
     timeSlotsGrid.querySelectorAll('.time-slot-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
-        selectedTime = btn.getAttribute('data-time') || '10:00'
+        selectedTime = btn.getAttribute('data-time') || schedule.slots[0]
         renderTimeSlots()
         updateSummary()
       })
@@ -940,27 +1333,37 @@ export function renderBookingView(container) {
   function updateSummary() {
     if (!selectedService) return
     const graceMins = selectedService.grace_minutes || 25
-    const { limit12 } = calculateGraceLimit(selectedTime, graceMins)
-    const time12 = formatTime12h(selectedTime)
+    const schedule = getScheduleForDate(selectedDate)
+    const { limit12 } = calculateGraceLimit(selectedTime || '17:00', graceMins)
+    const time12 = schedule.isOpen && selectedTime ? formatTime12h(selectedTime) : 'Cerrado (Sábado)'
+    const effectivePrice = getEffectivePrice()
 
-    if (summaryServiceName) summaryServiceName.textContent = selectedService.name
+    if (summaryServiceName) {
+      summaryServiceName.textContent = selectedPlan
+        ? `${selectedService.name} — ${selectedPlan.name}`
+        : selectedService.name
+    }
     if (summaryCategoryBadge) summaryCategoryBadge.textContent = selectedService.category || 'Estudio'
     if (summaryPeople) {
       summaryPeople.textContent = `${peopleCount} ${peopleCount === 1 ? 'persona' : 'personas'}`
     }
     if (summaryDate) summaryDate.textContent = formatDateSpanish(selectedDate)
     if (summaryTime) summaryTime.textContent = time12
-    if (summaryPrice) summaryPrice.textContent = formatPriceSlot(selectedService.price)
-    if (summaryDeposit) summaryDeposit.textContent = formatDeposit50(selectedService.price)
+    if (summaryPrice) summaryPrice.textContent = formatPriceSlot(effectivePrice)
+    if (summaryDeposit) summaryDeposit.textContent = formatDeposit50(effectivePrice)
 
     if (summaryGraceTitle) {
       summaryGraceTitle.textContent = `Tiempo de gracia: ${graceMins} minutos`
     }
     if (summaryGraceDesc) {
-      summaryGraceDesc.innerHTML = `Tu reserva a las <strong class="text-[#f7f5f4]">${time12}</strong> cuenta con tolerancia hasta las <strong class="text-[#E3B8D0]">${limit12}</strong> para llegar sin perder la cita.`
+      summaryGraceDesc.innerHTML = schedule.isOpen
+        ? `Tu reserva a las <strong class="text-[#f7f5f4]">${time12}</strong> cuenta con tolerancia hasta las <strong class="text-[#E3B8D0]">${limit12}</strong> para llegar sin perder la cita.`
+        : `Los sábados el estudio permanece cerrado. Selecciona una fecha de <strong class="text-[#f7f5f4]">Lunes a Viernes (5:00 PM a 8:00 PM)</strong> o <strong class="text-[#E3B8D0]">Domingos (8:00 AM a 5:00 PM)</strong>.`
     }
     if (graceInlineHint) {
-      graceInlineHint.textContent = `Límite de llegada: ${limit12}`
+      graceInlineHint.textContent = schedule.isOpen
+        ? `Límite de llegada: ${limit12}`
+        : 'Estudio cerrado los sábados'
     }
   }
 
@@ -973,9 +1376,13 @@ export function renderBookingView(container) {
       .order('id', { ascending: true })
 
     if (!error && Array.isArray(data) && data.length > 0) {
-      services = data
+      const filtered = data.filter((s) => ALLOWED_SERVICE_SLUGS.includes(s.slug))
+      services = filtered.length > 0 ? filtered : [...DEFAULT_SERVICES]
       const currentStillExists = services.find((s) => s.slug === selectedService?.slug)
       selectedService = currentStillExists || services[0]
+      if (!selectedPlan) {
+        selectedPlan = getPlansConfigForService(selectedService).plans[0]
+      }
       renderServices()
       updateSummary()
     }
@@ -1003,6 +1410,7 @@ export function renderBookingView(container) {
 
   inputDate?.addEventListener('change', () => {
     selectedDate = inputDate.value || todayStr
+    renderTimeSlots()
     updateSummary()
   })
 
@@ -1023,6 +1431,15 @@ export function renderBookingView(container) {
   form?.addEventListener('submit', (e) => {
     e.preventDefault()
     errorBox?.classList.add('hidden')
+
+    const scheduleCheck = getScheduleForDate(selectedDate)
+    if (!scheduleCheck.isOpen || !selectedTime) {
+      errorBox.textContent =
+        'Los sábados el estudio está cerrado. Por favor selecciona una fecha de Lunes a Viernes (5:00 PM a 8:00 PM) o Domingo (8:00 AM a 5:00 PM).'
+      errorBox.classList.remove('hidden')
+      inputDate?.focus()
+      return
+    }
 
     const clientName = inputName?.value.trim() || ''
     const clientEmail = inputEmail?.value.trim() || ''
@@ -1056,19 +1473,23 @@ export function renderBookingView(container) {
       return
     }
 
+    const fullServiceName = selectedPlan
+      ? `${selectedService?.name || 'Foto Navideña'} — ${selectedPlan.name}`
+      : selectedService?.name || 'Foto Navideña'
+
     pendingDraft = {
       booking_code: generateBookingCode(),
       client_name: clientName,
       client_email: clientEmail,
       client_phone: formattedPhone || 'No proporcionado (Solo correo)',
       service_id: selectedService?.id || null,
-      service_name: selectedService?.name || 'Foto Navideña',
+      service_name: fullServiceName,
       people_count: count,
       appointment_date: selectedDate,
       appointment_time: selectedTime,
       grace_minutes: selectedService?.grace_minutes || 25,
       status: 'pendiente',
-      estimated_price: selectedService?.price ?? null,
+      estimated_price: getEffectivePrice(),
     }
 
     if (transferClientName) transferClientName.textContent = clientName

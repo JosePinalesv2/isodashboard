@@ -33,6 +33,243 @@ export const APPOINTMENT_STATUSES = [
 ]
 
 /**
+ * Catálogo oficial de Planes y Fondos por Tipo de Sesión en ISO Estudio
+ */
+export const SESSION_PLANS_CATALOG = {
+  'foto-navidena': {
+    subtitle: 'Set Especial de Temporada Navideña • ISO Estudio',
+    modalBgImage: '/foto-navidena-bg.jpg',
+    headerImage: '/foto-navidena-bg.jpg',
+    flyerUrl: '/foto-navidena-bg.jpg',
+    isFullModalBg: true,
+    plans: [
+      {
+        id: 'estandar',
+        name: 'Plan Estándar Navideño',
+        price: 2800,
+        badge: 'Más Popular',
+        features: [
+          '7 fotos digitales editadas en alta resolución',
+          '1 hora 30 minutos en el set navideño',
+          '1 cambio de ropa incluido',
+        ],
+      },
+      {
+        id: 'premium',
+        name: 'Plan Premium Navideño',
+        price: 4800,
+        badge: 'Experiencia Completa',
+        features: [
+          '12 fotos digitales editadas en alta resolución',
+          '2 horas de sesión en el set navideño',
+          '2 cambios de ropa incluidos',
+        ],
+      },
+    ],
+  },
+  infantil: {
+    subtitle: 'Planes Fotográficos para Niños y Bebés • ISO Estudio',
+    modalBgImage: '/planes/infantil-header.jpg',
+    headerImage: '/planes/infantil-header.jpg',
+    flyerUrl: '/planes/flyer-ninos-2planes.jpg',
+    isFullModalBg: false,
+    plans: [
+      {
+        id: 'estandar',
+        name: 'Plan Estándar',
+        price: 1900,
+        badge: 'Ideal para Niños',
+        features: [
+          '4 fotos digitales',
+          '1:30 hora de sesión',
+          'Un cambio de ropa',
+        ],
+      },
+      {
+        id: 'premium',
+        name: 'Plan Premium',
+        price: 3200,
+        badge: 'Recomendado',
+        features: [
+          '7 fotos digitales',
+          '2 horas de sesión',
+          'Dos cambios de ropa',
+        ],
+      },
+    ],
+  },
+  retrato: {
+    subtitle: 'Planes de Retrato, Cumpleaños y Estudio • ISO Estudio',
+    modalBgImage: '/planes/retrato-header.jpg',
+    headerImage: '/planes/retrato-header.jpg',
+    flyerUrl: '/planes/flyer-3planes.jpg',
+    isFullModalBg: false,
+    plans: [
+      {
+        id: 'basico',
+        name: 'Plan Básico',
+        price: 1600,
+        badge: 'Sesión Express',
+        features: [
+          '4 fotos digitales',
+          '45 minutos de sesión',
+        ],
+      },
+      {
+        id: 'estandar',
+        name: 'Plan Estándar',
+        price: 2800,
+        badge: 'Más Elegido',
+        features: [
+          '7 fotos digitales',
+          '1:30 hora de sesión',
+          'Un cambio de ropa',
+        ],
+      },
+      {
+        id: 'premium',
+        name: 'Plan Premium',
+        price: 4800,
+        badge: 'Editorial Completo',
+        features: [
+          '12 fotos digitales',
+          '2 horas de sesión',
+          'Dos cambios de ropa',
+        ],
+      },
+    ],
+  },
+  maternidad: {
+    subtitle: 'Sesión Artística de Maternidad • ISO Estudio',
+    modalBgImage: '/carousel/iso-slide-10.jpg',
+    headerImage: '/carousel/iso-slide-10.jpg',
+    flyerUrl: '/planes/flyer-3planes.jpg',
+    isFullModalBg: false,
+    plans: [
+      {
+        id: 'basico',
+        name: 'Plan Básico',
+        price: 1600,
+        badge: 'Esencial',
+        features: [
+          '4 fotos digitales',
+          '45 minutos de sesión',
+        ],
+      },
+      {
+        id: 'estandar',
+        name: 'Plan Estándar',
+        price: 2800,
+        badge: 'Más Elegido',
+        features: [
+          '7 fotos digitales',
+          '1:30 hora de sesión',
+          'Un cambio de ropa',
+        ],
+      },
+      {
+        id: 'premium',
+        name: 'Plan Premium',
+        price: 4800,
+        badge: 'Experiencia Completa',
+        features: [
+          '12 fotos digitales',
+          '2 horas de sesión',
+          'Dos cambios de ropa',
+        ],
+      },
+    ],
+  },
+  corporativa: {
+    subtitle: 'Retrato Ejecutivo y Marca Personal • ISO Estudio',
+    modalBgImage: '/carousel/iso-slide-11.jpg',
+    headerImage: '/carousel/iso-slide-11.jpg',
+    flyerUrl: '/planes/flyer-3planes.jpg',
+    isFullModalBg: false,
+    plans: [
+      {
+        id: 'basico',
+        name: 'Plan Básico',
+        price: 1600,
+        badge: 'Perfil Profesional',
+        features: [
+          '4 fotos digitales',
+          '45 minutos de sesión',
+        ],
+      },
+      {
+        id: 'estandar',
+        name: 'Plan Estándar',
+        price: 2800,
+        badge: 'Marca Personal',
+        features: [
+          '7 fotos digitales',
+          '1:30 hora de sesión',
+          'Un cambio de ropa',
+        ],
+      },
+      {
+        id: 'premium',
+        name: 'Plan Premium',
+        price: 4800,
+        badge: 'Corporativo Total',
+        features: [
+          '12 fotos digitales',
+          '2 horas de sesión',
+          'Dos cambios de ropa',
+        ],
+      },
+    ],
+  },
+  familia: {
+    subtitle: 'Retrato Grupal y Recuerdo Familiar • ISO Estudio',
+    modalBgImage: '/carousel/iso-slide-04.jpg',
+    headerImage: '/carousel/iso-slide-04.jpg',
+    flyerUrl: '/planes/flyer-3planes.jpg',
+    isFullModalBg: false,
+    plans: [
+      {
+        id: 'basico',
+        name: 'Plan Básico',
+        price: 1600,
+        badge: 'Recuerdo Familiar',
+        features: [
+          '4 fotos digitales',
+          '45 minutos de sesión',
+        ],
+      },
+      {
+        id: 'estandar',
+        name: 'Plan Estándar',
+        price: 2800,
+        badge: 'Más Popular',
+        features: [
+          '7 fotos digitales',
+          '1:30 hora de sesión',
+          'Un cambio de ropa',
+        ],
+      },
+      {
+        id: 'premium',
+        name: 'Plan Premium',
+        price: 4800,
+        badge: 'Sesión Extendida',
+        features: [
+          '12 fotos digitales',
+          '2 horas de sesión',
+          'Dos cambios de ropa',
+        ],
+      },
+    ],
+  },
+}
+
+export function getPlansConfigForService(service = {}) {
+  const slug = service.slug || ''
+  return SESSION_PLANS_CATALOG[slug] || SESSION_PLANS_CATALOG.retrato
+}
+
+/**
  * Comprime y redimensiona la imagen del comprobante bancario en el navegador
  * para que se guarde rápido y nítido en Supabase sin requerir configuración externa.
  */
