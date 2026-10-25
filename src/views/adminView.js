@@ -35,14 +35,14 @@ function renderAdminLogin(container) {
       <div class="iso-card max-w-sm w-full p-8 sm:p-10 border border-[#D795B7]/35 flex flex-col items-center text-center">
         
         <div class="w-16 h-16 rounded-full bg-[#141114] border border-[#D795B7]/55 flex items-center justify-center mb-5 overflow-hidden shadow-lg">
-          <img src="/logo-pink-clean.png" alt="ISO Studio Admin" class="w-12 h-12 object-contain" />
+          <img src="/logo-pink-clean.png" alt="ISO Estudio Admin" class="w-12 h-12 object-contain" />
         </div>
 
         <span class="text-[10px] uppercase tracking-[0.22em] text-[#D795B7] font-semibold">
           Acceso Exclusivo • Esther
         </span>
         <h1 class="font-serif-editorial text-3xl text-[#f7f5f4] mt-1.5">
-          Panel ISO Studio
+          Panel ISO Estudio
         </h1>
         <p class="text-xs text-[#c9a3b1] mt-2 leading-relaxed">
           Ingresa tu código de 4 dígitos para administrar tus solicitudes, citas e historial.
@@ -135,7 +135,7 @@ function renderAdminLogin(container) {
       if (enteredPin.length === 4) {
         if (enteredPin === ADMIN_PIN) {
           sessionStorage.setItem('iso_admin_auth', 'true')
-          showToast('Bienvenida Esther al panel de ISO Studio', 'success')
+          showToast('Bienvenida Esther al panel de ISO Estudio', 'success')
           renderAdminView(container)
         } else {
           errorEl?.classList.remove('opacity-0')
@@ -194,7 +194,7 @@ function renderAdminDashboard(container) {
           <div class="flex items-center gap-2.5">
             <span class="w-2 h-2 rounded-full bg-[#86efac]"></span>
             <span class="text-[11px] uppercase tracking-[0.2em] text-[#D795B7] font-semibold">
-              Administración ISO Studio
+              Administración ISO Estudio
             </span>
           </div>
           <h1 class="font-serif-editorial text-3xl sm:text-5xl text-[#f7f5f4] font-semibold tracking-wide">

@@ -19,7 +19,7 @@ export const isSupabaseConfigured = Boolean(
 
 if (!isSupabaseConfigured) {
   console.warn(
-    '[ISO Studio] Faltan las variables de Supabase en .env.'
+    '[ISO Estudio] Faltan las variables de Supabase en .env.'
   )
 }
 

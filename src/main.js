@@ -22,13 +22,13 @@ function router() {
   }
 
   if (hash === '#admin') {
-    document.title = 'ISO Studio | Dashboard Administradora'
+    document.title = 'ISO Estudio | Dashboard Administradora'
     adminOnlyNav?.classList.remove('hidden')
     adminOnlyNav?.classList.add('flex')
     if (headerSubtitle) headerSubtitle.textContent = 'Panel de Administración • Esther'
     currentCleanup = renderAdminView(viewContainer)
   } else {
-    document.title = 'ISO Studio | Reservar Sesión'
+    document.title = 'ISO Estudio | Reservar Sesión'
     adminOnlyNav?.classList.add('hidden')
     adminOnlyNav?.classList.remove('flex')
     if (headerSubtitle) headerSubtitle.textContent = 'Estudio Fotográfico • San Cristóbal, RD'

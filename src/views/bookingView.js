@@ -97,20 +97,20 @@ const TIME_SLOTS = [
 ]
 
 const ISO_CAROUSEL_SLIDES = [
-  { src: '/carousel/iso-slide-01.jpg', tag: 'Retrato Editorial • ISO Studio' },
+  { src: '/carousel/iso-slide-01.jpg', tag: 'Retrato Editorial • ISO Estudio' },
   { src: '/carousel/iso-slide-02.jpg', tag: 'Sesión de Estudio • Iluminación de Autor' },
-  { src: '/carousel/iso-slide-03.jpg', tag: 'Dirección Creativa • ISO Studio' },
+  { src: '/carousel/iso-slide-03.jpg', tag: 'Dirección Creativa • ISO Estudio' },
   { src: '/carousel/iso-slide-04.jpg', tag: 'Retrato Fine Art • San Cristóbal' },
   { src: '/carousel/iso-slide-05.jpg', tag: 'Sesión Personalizada • Estudio' },
-  { src: '/carousel/iso-slide-06.jpg', tag: 'Estética Boutique • ISO Studio' },
+  { src: '/carousel/iso-slide-06.jpg', tag: 'Estética Boutique • ISO Estudio' },
   { src: '/carousel/iso-slide-07.jpg', tag: 'Fotografía de Retrato & Cumpleaños' },
-  { src: '/carousel/iso-slide-08.jpg', tag: 'Retrato Contemporáneo • ISO Studio' },
+  { src: '/carousel/iso-slide-08.jpg', tag: 'Retrato Contemporáneo • ISO Estudio' },
   { src: '/carousel/iso-slide-09.jpg', tag: 'Sesión Artística en Estudio' },
   { src: '/carousel/iso-slide-10.jpg', tag: 'Maternidad, Infantil & Familia' },
   { src: '/carousel/iso-slide-11.jpg', tag: 'Editorial & Marca Personal' },
-  { src: '/carousel/iso-slide-12.jpg', tag: 'Retrato Íntimo • ISO Studio' },
+  { src: '/carousel/iso-slide-12.jpg', tag: 'Retrato Íntimo • ISO Estudio' },
   { src: '/carousel/iso-slide-13.jpg', tag: 'Temporada & Sesiones Especiales' },
-  { src: '/carousel/iso-slide-14.jpg', tag: 'Narrativa Visual • ISO Studio' },
+  { src: '/carousel/iso-slide-14.jpg', tag: 'Narrativa Visual • ISO Estudio' },
 ]
 
 export function renderBookingView(container) {
@@ -154,7 +154,7 @@ export function renderBookingView(container) {
       <!-- Contenido Principal Flotando en Glassmorphism sobre el Carrusel -->
       <div class="relative z-10 animate-view-enter max-w-5xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
         
-        <!-- Hero Dinámico: Encabezado + Carrusel Interactivo de Fotos de ISO Studio -->
+        <!-- Hero Dinámico: Encabezado + Carrusel Interactivo de Fotos de ISO Estudio -->
         <div class="iso-card p-6 sm:p-8 mb-8 border border-[#D795B7]/30">
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
             
@@ -168,12 +168,12 @@ export function renderBookingView(container) {
                 Reserva tu sesión fotográfica
               </h1>
               <p class="text-sm sm:text-base text-[#c9a3b1] leading-relaxed">
-                Completa los datos esenciales para agendar tu espacio en <strong class="text-[#f7f5f4] font-medium">ISO Studio</strong>.
+                Completa los datos esenciales para agendar tu espacio en <strong class="text-[#f7f5f4] font-medium">ISO Estudio</strong>.
                 Tu cita se aparta realizando la transferencia del <strong class="text-[#E3B8D0] font-medium">50% y anexando tu comprobante</strong>, y cuenta con <strong class="text-[#E3B8D0] font-medium">20 a 30 minutos de gracia</strong> para tu llegada.
               </p>
             </div>
 
-            <!-- Visor del Carrusel en Vivo de ISO Studio -->
+            <!-- Visor del Carrusel en Vivo de ISO Estudio -->
             <div class="lg:col-span-5">
               <div class="relative aspect-[4/3] w-full rounded-2xl overflow-hidden border border-[#D795B7]/40 shadow-2xl bg-[#0a0a0a] group">
                 ${ISO_CAROUSEL_SLIDES.map(
@@ -192,7 +192,7 @@ export function renderBookingView(container) {
                 <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/45 to-transparent p-3.5 flex items-end justify-between gap-2 z-10">
                   <div>
                     <span class="text-[10px] uppercase tracking-[0.18em] text-[#E3B8D0] font-semibold block">
-                      Portafolio ISO Studio
+                      Portafolio ISO Estudio
                     </span>
                     <p id="carousel-caption" class="text-xs text-[#f7f5f4] font-medium mt-0.5">
                       ${ISO_CAROUSEL_SLIDES[0].tag}
@@ -483,7 +483,7 @@ export function renderBookingView(container) {
                  Realiza tu transferencia y anexa el comprobante
               </h3>
               <p class="text-xs text-[#c9a3b1] mt-1 leading-relaxed">
-                ¡Hola <strong id="transfer-client-name" class="text-[#f7f5f4]"></strong>! Para evitar reservas sin confirmar y asegurar tu fecha en <strong class="text-[#f7f5f4]">ISO Studio</strong>, realiza la transferencia del <strong class="text-[#E3B8D0]">50%</strong> y sube la captura de tu comprobante aquí debajo:
+                ¡Hola <strong id="transfer-client-name" class="text-[#f7f5f4]"></strong>! Para evitar reservas sin confirmar y asegurar tu fecha en <strong class="text-[#f7f5f4]">ISO Estudio</strong>, realiza la transferencia del <strong class="text-[#E3B8D0]">50%</strong> y sube la captura de tu comprobante aquí debajo:
               </p>
             </div>
             <button

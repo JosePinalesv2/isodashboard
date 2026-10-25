@@ -1,6 +1,6 @@
 /**
  * Utilidades de formato, compresión de comprobante de transferencia 50%,
- * contacto (Correo + Teléfono +1) y tiempo de gracia (20–30 min) para ISO Studio
+ * contacto (Correo + Teléfono +1) y tiempo de gracia (20–30 min) para ISO Estudio
  */
 
 export const BANK_ACCOUNTS_INFO = {
@@ -331,13 +331,13 @@ export function buildWhatsAppLink(appointment) {
     appointment.status === 'completada'
 
   const message = isAccepted
-    ? `¡Hola ${appointment.client_name}! Te escribe Esther de *ISO Studio*. Hemos verificado tu comprobante del 50% y te confirmamos que todo está correcto: tu reserva (*${appointment.booking_code}*) queda *ACEPTADA*.\n\n` +
+    ? `¡Hola ${appointment.client_name}! Te escribe Esther de *ISO Estudio*. Hemos verificado tu comprobante del 50% y te confirmamos que todo está correcto: tu reserva (*${appointment.booking_code}*) queda *ACEPTADA*.\n\n` +
       `• Sesión: ${appointment.service_name}\n` +
       `• Personas: ${appointment.people_count}\n` +
       `• Fecha: ${formatDateSpanish(appointment.appointment_date)}\n` +
       `• Hora: ${formatTime12h(appointment.appointment_time)} (Recuerda que tienes tolerancia de llegada hasta las ${limit12})\n\n` +
       `¡Te esperamos en el estudio!`
-    : `Hola ${appointment.client_name}, te escribimos de *ISO Studio* respecto a tu solicitud de reserva (*${appointment.booking_code}*) para la sesión de *${appointment.service_name}* el ${formatDateSpanish(appointment.appointment_date)} a las ${formatTime12h(appointment.appointment_time)}.`
+    : `Hola ${appointment.client_name}, te escribimos de *ISO Estudio* respecto a tu solicitud de reserva (*${appointment.booking_code}*) para la sesión de *${appointment.service_name}* el ${formatDateSpanish(appointment.appointment_date)} a las ${formatTime12h(appointment.appointment_time)}.`
 
   return `https://wa.me/${phoneWithCountry}?text=${encodeURIComponent(message)}`
 }
@@ -356,22 +356,22 @@ export function buildEmailLink(appointment) {
     appointment.status === 'completada'
 
   const subject = isAccepted
-    ? `¡Cita Confirmada! Pago 50% Verificado (${appointment.booking_code}) — ISO Studio`
-    : `Información sobre tu Reserva ${appointment.booking_code} — ISO Studio`
+    ? `¡Cita Confirmada! Pago 50% Verificado (${appointment.booking_code}) — ISO Estudio`
+    : `Información sobre tu Reserva ${appointment.booking_code} — ISO Estudio`
 
   const body = isAccepted
     ? `¡Hola ${appointment.client_name}!\n\n` +
-      `Te escribimos de ISO Studio para confirmarte que hemos verificado tu transferencia del 50% y todo está correcto. Tu cita ha sido ACEPTADA y agendada:\n\n` +
+      `Te escribimos de ISO Estudio para confirmarte que hemos verificado tu transferencia del 50% y todo está correcto. Tu cita ha sido ACEPTADA y agendada:\n\n` +
       `• Código de reserva: ${appointment.booking_code}\n` +
       `• Tipo de sesión: ${appointment.service_name}\n` +
       `• Cantidad de personas: ${appointment.people_count}\n` +
       `• Fecha: ${formatDateSpanish(appointment.appointment_date)}\n` +
       `• Hora reservada: ${formatTime12h(appointment.appointment_time)} (Cuentas con ${appointment.grace_minutes || 25} minutos de gracia, hasta las ${limit12})\n\n` +
       `¡Te esperamos en el estudio!\n` +
-      `Esther Jiménez García • ISO Studio (San Cristóbal, RD)`
+      `Esther Jiménez García • ISO Estudio (San Cristóbal, RD)`
     : `Hola ${appointment.client_name},\n\n` +
-      `Te contactamos de ISO Studio respecto a tu reserva (${appointment.booking_code}) para el día ${formatDateSpanish(appointment.appointment_date)} a las ${formatTime12h(appointment.appointment_time)}.\n\n` +
-      `Saludos,\nEsther Jiménez García • ISO Studio`
+      `Te contactamos de ISO Estudio respecto a tu reserva (${appointment.booking_code}) para el día ${formatDateSpanish(appointment.appointment_date)} a las ${formatTime12h(appointment.appointment_time)}.\n\n` +
+      `Saludos,\nEsther Jiménez García • ISO Estudio`
 
   return `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
 }

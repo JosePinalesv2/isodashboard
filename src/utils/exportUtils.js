@@ -83,7 +83,7 @@ export function printBookingTicket(appointment) {
     <html lang="es">
     <head>
       <meta charset="UTF-8" />
-      <title>Comprobante ${appointment.booking_code} — ISO Studio</title>
+      <title>Comprobante ${appointment.booking_code} — ISO Estudio</title>
       <style>
         body {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -147,7 +147,7 @@ export function printBookingTicket(appointment) {
     </head>
     <body>
       <div class="card">
-        <h1 class="brand">ISO STUDIO</h1>
+        <h1 class="brand">ISO ESTUDIO</h1>
         <div class="sub">Comprobante de Reserva y Abono del 50% • San Cristóbal, RD</div>
         <div class="row"><span class="label">Código de Reserva:</span><span class="val">${appointment.booking_code}</span></div>
         <div class="row"><span class="label">Estado actual:</span><span class="val">${appointment.status === 'confirmada' ? 'ACEPTADA (Pago Verificado)' : 'Pendiente validación de transferencia'}</span></div>
