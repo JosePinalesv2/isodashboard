@@ -97,6 +97,7 @@ const TIME_SLOTS = [
 ]
 
 const ISO_CAROUSEL_SLIDES = [
+  { src: '/foto-navidena-bg.jpg', tag: 'Foto Navideña • Set de Temporada — ISO Estudio' },
   { src: '/carousel/iso-slide-01.jpg', tag: 'Retrato Editorial • ISO Estudio' },
   { src: '/carousel/iso-slide-02.jpg', tag: 'Sesión de Estudio • Iluminación de Autor' },
   { src: '/carousel/iso-slide-03.jpg', tag: 'Dirección Creativa • ISO Estudio' },
@@ -496,23 +497,23 @@ export function renderBookingView(container) {
             </button>
           </div>
 
-          <!-- PASO A DEL MODAL: Cuentas Bancarias + Imagen Oficial -->
-          <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
-            <div class="sm:col-span-7 space-y-2.5">
-              <span class="text-[11px] uppercase tracking-[0.15em] text-[#D795B7] font-semibold block">
-                1. Cuentas de ahorro oficiales
-              </span>
+          <!-- PASO A DEL MODAL: Cuentas Bancarias Oficiales (Sin imagen blanca lateral) -->
+          <div class="space-y-3">
+            <span class="text-[11px] uppercase tracking-[0.15em] text-[#D795B7] font-semibold block">
+              1. Cuentas de ahorro oficiales
+            </span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               ${BANK_ACCOUNTS_INFO.accounts
                 .map(
                   (acc) => `
-                <div class="bg-[#0a0a0a] border border-[#f7f5f4]/10 rounded-xl p-3 flex items-center justify-between gap-2">
+                <div class="bg-[#0a0a0a] border border-[#f7f5f4]/10 rounded-xl p-3.5 flex items-center justify-between gap-2">
                   <div>
                     <div class="flex items-center gap-2">
                       <span class="w-2 h-2 rounded-full" style="background:${acc.accent}"></span>
                       <span class="text-xs font-semibold text-[#f7f5f4] uppercase tracking-wider">${acc.bank}</span>
                       <span class="text-[10px] text-[#c9a3b1]">(${BANK_ACCOUNTS_INFO.accountType})</span>
                     </div>
-                    <p class="font-mono-code text-base text-[#E3B8D0] font-medium mt-0.5 tracking-wide">
+                    <p class="font-mono-code text-base text-[#E3B8D0] font-medium mt-1 tracking-wide">
                       ${acc.number}
                     </p>
                   </div>
@@ -528,44 +529,25 @@ export function renderBookingView(container) {
               `
                 )
                 .join('')}
-
-              <div class="bg-[#141114] border border-[#D795B7]/25 rounded-xl p-3 space-y-1 text-xs">
-                <div class="flex items-center justify-between">
-                  <span class="text-[#c9a3b1]">Titular:</span>
-                  <strong class="text-[#f7f5f4] font-medium">${BANK_ACCOUNTS_INFO.holderName}</strong>
-                </div>
-                <div class="flex items-center justify-between">
-                  <span class="text-[#c9a3b1]">Cédula:</span>
-                  <div class="flex items-center gap-2">
-                    <strong class="font-mono-code text-[#f7f5f4]">${BANK_ACCOUNTS_INFO.holderId}</strong>
-                    <button
-                      type="button"
-                      data-copy="${BANK_ACCOUNTS_INFO.holderId}"
-                      data-copy-label="Cédula"
-                      class="btn-copy-bank text-[10px] underline text-[#E3B8D0] hover:text-[#f7f5f4] cursor-pointer"
-                    >
-                      Copiar
-                    </button>
-                  </div>
-                </div>
-              </div>
             </div>
 
-            <div class="sm:col-span-5 flex flex-col items-center">
-              <a
-                href="/cuentas-banco.jpg"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="block rounded-xl overflow-hidden border border-[#D795B7]/35 shadow-lg hover:scale-[1.02] transition-transform"
-                title="Abrir imagen de cuentas bancarias en tamaño completo"
-              >
-                <img
-                  src="/cuentas-banco.jpg"
-                  alt="Cuentas de banco BHD y Banreservas — Esther Jiménez García"
-                  class="w-full max-w-[180px] sm:max-w-[210px] h-auto object-cover"
-                />
-              </a>
-              <span class="text-[10px] text-[#c9a3b1] mt-1">Toca la imagen para ampliarla</span>
+            <div class="bg-[#141114] border border-[#D795B7]/25 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+              <div class="flex items-center gap-2">
+                <span class="text-[#c9a3b1]">Titular:</span>
+                <strong class="text-[#f7f5f4] font-medium">${BANK_ACCOUNTS_INFO.holderName}</strong>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-[#c9a3b1]">Cédula:</span>
+                <strong class="font-mono-code text-[#f7f5f4]">${BANK_ACCOUNTS_INFO.holderId}</strong>
+                <button
+                  type="button"
+                  data-copy="${BANK_ACCOUNTS_INFO.holderId}"
+                  data-copy-label="Cédula"
+                  class="btn-copy-bank text-[10px] underline text-[#E3B8D0] hover:text-[#f7f5f4] cursor-pointer ml-1"
+                >
+                  Copiar
+                </button>
+              </div>
             </div>
           </div>
 
@@ -863,32 +845,46 @@ export function renderBookingView(container) {
           <button
             type="button"
             data-service-slug="${srv.slug}"
-            class="service-option text-left p-4 rounded-xl border transition cursor-pointer flex flex-col justify-between min-h-[108px] ${
+            class="service-option group relative overflow-hidden text-left p-4 rounded-xl border transition cursor-pointer flex flex-col justify-between min-h-[116px] ${
               isSelected
-                ? 'bg-[#1f151a] border-[#D795B7] shadow-[0_0_0_1px_rgba(215,149,183,0.35)]'
+                ? 'bg-[#1f151a] border-[#D795B7] shadow-[0_0_0_1px_rgba(215,149,183,0.45)]'
                 : 'bg-[#141114] border-[#f7f5f4]/10 hover:border-[#D795B7]/40'
             }"
           >
-            <div class="flex items-start justify-between gap-2 w-full">
+            ${
+              isNavidad
+                ? `
+                <img
+                  src="/foto-navidena-bg.jpg"
+                  alt=""
+                  aria-hidden="true"
+                  class="absolute inset-0 w-full h-full object-cover object-center opacity-55 transition-transform duration-500 group-hover:scale-105 pointer-events-none"
+                />
+                <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/95 via-[#141114]/70 to-[#0a0a0a]/45 pointer-events-none"></div>
+              `
+                : ''
+            }
+
+            <div class="relative z-10 flex items-start justify-between gap-2 w-full">
               <div>
-                <span class="font-serif-editorial text-lg font-semibold text-[#f7f5f4] block leading-snug">
+                <span class="font-serif-editorial text-lg font-semibold text-[#f7f5f4] block leading-snug drop-shadow-sm">
                   ${srv.name}
                 </span>
-                <span class="text-[11px] text-[#c9a3b1] block mt-0.5">
+                <span class="text-[11px] ${isNavidad ? 'text-[#f7f5f4]/90' : 'text-[#c9a3b1]'} block mt-0.5">
                   +${srv.grace_minutes || 25} min de gracia
                 </span>
               </div>
               ${
                 isNavidad
-                  ? `<span class="badge-grace text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-full font-semibold shrink-0">Temporada</span>`
+                  ? `<span class="badge-grace bg-[#161014]/85 backdrop-blur-sm text-[9px] uppercase tracking-wider px-2.5 py-0.5 rounded-full font-semibold shrink-0">Temporada</span>`
                   : `<span class="w-4 h-4 rounded-full border ${
                       isSelected ? 'border-[#D795B7] bg-[#D795B7]' : 'border-[#f7f5f4]/25'
                     } flex items-center justify-center shrink-0 mt-1"></span>`
               }
             </div>
 
-            <div class="mt-3 pt-2 border-t border-[#f7f5f4]/5 flex items-center justify-between w-full text-[11px]">
-              <span class="text-[#c9a3b1]">Tarifa:</span>
+            <div class="relative z-10 mt-3 pt-2 border-t border-[#f7f5f4]/15 flex items-center justify-between w-full text-[11px]">
+              <span class="${isNavidad ? 'text-[#f7f5f4]/85' : 'text-[#c9a3b1]'}">Tarifa:</span>
               <span class="font-mono-code text-[#E3B8D0] font-medium">${formatPriceSlot(srv.price)}</span>
             </div>
           </button>
@@ -902,6 +898,10 @@ export function renderBookingView(container) {
         const found = services.find((s) => s.slug === slug)
         if (found) {
           selectedService = found
+          if (found.slug === 'foto-navidena' || found.is_featured) {
+            goToSlide(0)
+            resetCarouselTimer()
+          }
           renderServices()
           updateSummary()
         }
