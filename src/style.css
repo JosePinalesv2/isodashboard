@@ -1,0 +1,241 @@
+@import "tailwindcss";
+
+:root {
+  /* Paleta Oficial de ISO Studio (tomada directamente de isolinks) */
+  --bg: #0a0a0a;
+  --bg-soft: #141114;
+  --brand-black: #211915;
+  --card: #161014;
+  --card-hover: #1f151a;
+  --cream: #f7f5f4;
+  --muted: #c9a3b1;
+  --rose: #D795B7;
+  --rose-light: #E3B8D0;
+  --line: rgba(247, 245, 244, 0.09);
+  --line-rose: rgba(215, 149, 183, 0.32);
+
+  /* Curvas de animación (Emil Kowalski Design Engineering) */
+  --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg);
+  color: var(--cream);
+  font-family: 'Jost', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(215, 149, 183, 0.10), transparent 55%),
+    radial-gradient(ellipse at 50% 110%, rgba(227, 184, 208, 0.05), transparent 55%),
+    var(--bg);
+  min-height: 100vh;
+}
+
+.font-serif-editorial {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.font-mono-code {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Superficies Glassmorphism Boutique + Paleta ISO Studio */
+.iso-card {
+  background-color: rgba(22, 16, 20, 0.72);
+  backdrop-filter: blur(20px) saturate(135%);
+  -webkit-backdrop-filter: blur(20px) saturate(135%);
+  border: 1px solid rgba(247, 245, 244, 0.13);
+  border-radius: 16px;
+  box-shadow: 0 20px 48px -16px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(247, 245, 244, 0.08);
+  transition:
+    border-color 180ms var(--ease-out-quart),
+    background-color 180ms var(--ease-out-quart),
+    transform 180ms var(--ease-out-quart);
+}
+
+.iso-card-interactive:hover {
+  background-color: rgba(31, 21, 26, 0.84);
+  border-color: var(--line-rose);
+}
+
+/* Carrusel de Fondo Difuminado (Ambient Glass Background) y Showcase Hero */
+.iso-bg-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: scale(1.02);
+  transition:
+    opacity 1500ms var(--ease-out-quint),
+    transform 6500ms var(--ease-out-quint);
+  will-change: opacity, transform;
+}
+
+.iso-bg-slide.active {
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+.iso-showcase-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: scale(1.03);
+  transition:
+    opacity 900ms var(--ease-out-quint),
+    transform 4500ms var(--ease-out-quint);
+  will-change: opacity, transform;
+}
+
+.iso-showcase-slide.active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Botones con respuesta táctil scale(0.97) de Emil Kowalski */
+.btn-iso-primary {
+  background-color: rgba(215, 149, 183, 0.14);
+  border: 1px solid rgba(215, 149, 183, 0.65);
+  color: var(--cream);
+  border-radius: 9999px;
+  min-height: 44px;
+  transition:
+    transform 150ms var(--ease-out-quart),
+    background-color 180ms var(--ease-out-quart),
+    border-color 180ms var(--ease-out-quart),
+    box-shadow 180ms var(--ease-out-quart);
+}
+
+.btn-iso-primary:hover {
+  background-color: rgba(215, 149, 183, 0.24);
+  border-color: var(--rose-light);
+  box-shadow: 0 8px 24px -6px rgba(215, 149, 183, 0.25);
+}
+
+.btn-iso-primary:active,
+.btn-iso-secondary:active,
+.btn-tactile:active {
+  transform: scale(0.97);
+}
+
+.btn-iso-secondary {
+  background-color: var(--card);
+  border: 1px solid var(--line);
+  color: var(--cream);
+  border-radius: 10px;
+  min-height: 44px;
+  transition:
+    transform 150ms var(--ease-out-quart),
+    border-color 180ms var(--ease-out-quart),
+    background-color 180ms var(--ease-out-quart);
+}
+
+.btn-iso-secondary:hover {
+  background-color: var(--card-hover);
+  border-color: rgba(215, 149, 183, 0.35);
+}
+
+/* Inputs editoriales accesibles */
+.iso-input {
+  width: 100%;
+  min-height: 46px;
+  background-color: var(--bg-soft);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: var(--cream);
+  font-size: 14px;
+  transition: border-color 160ms var(--ease-out-quart), background-color 160ms var(--ease-out-quart);
+}
+
+.iso-input::placeholder {
+  color: rgba(201, 163, 177, 0.45);
+}
+
+.iso-input:focus-visible {
+  outline: none;
+  border-color: var(--rose);
+  background-color: var(--card);
+}
+
+/* Badges semánticos discretos (Minimalist UI Pastels adaptados al fondo oscuro de ISO Studio) */
+.badge-grace {
+  background-color: rgba(215, 149, 183, 0.12);
+  color: var(--rose-light);
+  border: 1px solid rgba(215, 149, 183, 0.28);
+}
+
+.badge-arrived {
+  background-color: rgba(134, 239, 172, 0.10);
+  color: #bbf7d0;
+  border: 1px solid rgba(134, 239, 172, 0.25);
+}
+
+.badge-warning {
+  background-color: rgba(252, 211, 77, 0.12);
+  color: #fde68a;
+  border: 1px solid rgba(252, 211, 77, 0.30);
+}
+
+.badge-expired {
+  background-color: rgba(253, 164, 175, 0.10);
+  color: #fecdd3;
+  border: 1px solid rgba(253, 164, 175, 0.25);
+}
+
+/* Animaciones de entrada de vistas y Toasts (nunca desde scale(0), siempre scale(0.96)) */
+@keyframes viewEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-view-enter {
+  animation: viewEnter 260ms var(--ease-out-quint) forwards;
+}
+
+@keyframes toastEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.toast-item {
+  animation: toastEnter 220ms var(--ease-out-quint) forwards;
+}
+
+.toast-leave {
+  opacity: 0;
+  transform: translateY(8px) scale(0.96);
+  transition: opacity 180ms var(--ease-out-quart), transform 180ms var(--ease-out-quart);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

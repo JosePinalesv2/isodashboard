@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/logo-pink-clean.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ISO Studio | Reservas Fotográficas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&family=Jost:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="selection:bg-[#D795B7]/30 selection:text-[#f7f5f4]">
+    <!-- Barra Superior Editorial Limpia (Sin botones de Admin ni Base de Datos para el cliente) -->
+    <header class="sticky top-0 z-30 bg-[#0a0a0a]/90 backdrop-blur-md border-b border-[#f7f5f4]/10 px-4 sm:px-8 h-18 flex items-center justify-between">
+      <a href="#reservar" class="flex items-center gap-3.5 group focus-visible:outline-none">
+        <div class="w-10 h-10 rounded-full bg-[#161014] border border-[#D795B7]/50 flex items-center justify-center overflow-hidden transition-transform duration-200 group-hover:scale-105">
+          <img src="/logo-pink-clean.png" alt="ISO Studio" class="w-8 h-8 object-contain" />
+        </div>
+        <div>
+          <span class="font-serif-editorial text-lg sm:text-xl font-semibold tracking-[0.14em] uppercase text-[#f7f5f4] block leading-none">
+            ISO STUDIO
+          </span>
+          <span id="header-subtitle" class="text-[11px] tracking-[0.06em] text-[#c9a3b1] block mt-1">
+            Estudio Fotográfico • San Cristóbal, RD
+          </span>
+        </div>
+      </a>
+
+      <!-- Este enlace solo se muestra cuando Esther está dentro de #admin -->
+      <div id="admin-only-nav" class="hidden items-center gap-2.5">
+        <a
+          href="#reservar"
+          class="btn-iso-secondary px-3.5 py-2 text-xs font-medium flex items-center gap-2"
+          title="Ver página pública de reservas"
+        >
+          <span>Ver Página de Reservas</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Contenedor Principal Dinámico (#reservar o #admin) -->
+    <main id="view-container" class="min-h-[calc(100vh-4.5rem)]"></main>
+
+    <!-- Contenedor de Notificaciones Toast -->
+    <div
+      id="toast-container"
+      class="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none *:pointer-events-auto px-4 sm:px-0"
+    ></div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
