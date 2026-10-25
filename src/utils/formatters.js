@@ -40,6 +40,7 @@ export const SESSION_PLANS_CATALOG = {
     subtitle: 'Set Especial de Temporada Navideña • ISO Estudio',
     modalBgImage: '/foto-navidena-bg.jpg',
     headerImage: '/foto-navidena-bg.jpg',
+    galleryImages: ['/foto-navidena-bg.jpg'],
     flyerUrl: '/foto-navidena-bg.jpg',
     isFullModalBg: true,
     plans: [
@@ -48,6 +49,7 @@ export const SESSION_PLANS_CATALOG = {
         name: 'Plan Estándar Navideño',
         price: null,
         badge: 'Temporada Navideña',
+        cardImage: '/foto-navidena-bg.jpg',
         features: [
           'Sesión en el set decorado de Navidad',
           'Tarifa y paquete por confirmar en estudio',
@@ -58,6 +60,7 @@ export const SESSION_PLANS_CATALOG = {
         name: 'Plan Premium Navideño',
         price: null,
         badge: 'Experiencia Completa',
+        cardImage: '/foto-navidena-bg.jpg',
         features: [
           'Sesión extendida en el set decorado de Navidad',
           'Tarifa y paquete por confirmar en estudio',
@@ -67,8 +70,9 @@ export const SESSION_PLANS_CATALOG = {
   },
   infantil: {
     subtitle: 'Planes Fotográficos para Niños y Bebés • ISO Estudio',
-    modalBgImage: '/planes/infantil-header.jpg',
-    headerImage: '/planes/infantil-header.jpg',
+    modalBgImage: '/planes/infantil-ninos-2.jpg',
+    headerImage: '/planes/infantil-ninos-2.jpg',
+    galleryImages: ['/planes/infantil-nino-1.jpg', '/planes/infantil-ninos-2.jpg'],
     flyerUrl: '/planes/flyer-ninos-2planes.jpg',
     isFullModalBg: false,
     plans: [
@@ -77,6 +81,7 @@ export const SESSION_PLANS_CATALOG = {
         name: 'Plan Estándar',
         price: 1900,
         badge: 'Ideal para Niños',
+        cardImage: '/planes/infantil-nino-1.jpg',
         features: [
           '4 fotos digitales',
           '1:30 hora de sesión',
@@ -88,6 +93,7 @@ export const SESSION_PLANS_CATALOG = {
         name: 'Plan Premium',
         price: 3200,
         badge: 'Recomendado',
+        cardImage: '/planes/infantil-ninos-2.jpg',
         features: [
           '7 fotos digitales',
           '2 horas de sesión',
@@ -98,8 +104,9 @@ export const SESSION_PLANS_CATALOG = {
   },
   retrato: {
     subtitle: 'Planes de Retrato, Cumpleaños y Estudio • ISO Estudio',
-    modalBgImage: '/planes/retrato-header.jpg',
-    headerImage: '/planes/retrato-header.jpg',
+    modalBgImage: '/planes/retrato-hd.jpg',
+    headerImage: '/planes/retrato-hd.jpg',
+    galleryImages: ['/planes/retrato-hd.jpg'],
     flyerUrl: '/planes/flyer-3planes.jpg',
     isFullModalBg: false,
     plans: [
@@ -108,6 +115,7 @@ export const SESSION_PLANS_CATALOG = {
         name: 'Plan Básico',
         price: 1600,
         badge: 'Sesión Express',
+        cardImage: '/planes/retrato-hd.jpg',
         features: [
           '4 fotos digitales',
           '45 minutos de sesión',
@@ -118,6 +126,7 @@ export const SESSION_PLANS_CATALOG = {
         name: 'Plan Estándar',
         price: 2800,
         badge: 'Más Elegido',
+        cardImage: '/planes/retrato-hd.jpg',
         features: [
           '7 fotos digitales',
           '1:30 hora de sesión',
@@ -129,6 +138,7 @@ export const SESSION_PLANS_CATALOG = {
         name: 'Plan Premium',
         price: 4800,
         badge: 'Editorial Completo',
+        cardImage: '/planes/retrato-hd.jpg',
         features: [
           '12 fotos digitales',
           '2 horas de sesión',

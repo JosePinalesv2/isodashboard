@@ -552,14 +552,16 @@ export function renderBookingView(container) {
             </div>
 
             <!-- Galería / Vista Previa Visual de la Sesión dentro del Modal -->
-            <div class="relative rounded-2xl overflow-hidden border border-[#D795B7]/35 bg-[#0a0a0a]/80 shadow-xl">
-              <img
-                id="plan-modal-showcase-img"
-                src="/foto-navidena-bg.jpg"
-                alt="Vista previa de la sesión"
-                class="w-full h-48 sm:h-56 object-cover object-center"
-              />
-              <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/90 via-transparent to-transparent flex items-end justify-between p-4">
+            <div class="relative rounded-2xl overflow-hidden border border-[#D795B7]/35 bg-[#0a0a0a]/90 shadow-xl">
+              <div id="plan-modal-showcase-media" class="w-full">
+                <img
+                  id="plan-modal-showcase-img"
+                  src="/foto-navidena-bg.jpg"
+                  alt="Vista previa de la sesión"
+                  class="w-full h-52 sm:h-64 object-cover object-center"
+                />
+              </div>
+              <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/90 via-transparent to-transparent flex items-end justify-between p-4 pointer-events-none">
                 <span id="plan-modal-grace-pill" class="badge-arrived bg-[#0a0a0a]/85 backdrop-blur-sm text-[11px] font-mono-code px-3 py-1 rounded-full">
                   +25 min de gracia incluidos
                 </span>
@@ -568,9 +570,9 @@ export function renderBookingView(container) {
                   href="/planes/flyer-ninos-2planes.jpg"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="btn-iso-secondary bg-[#141114]/90 backdrop-blur-sm px-3.5 py-1.5 text-[11px] font-medium text-[#E3B8D0] hover:text-[#f7f5f4]"
+                  class="pointer-events-auto rounded-full bg-[#141114]/90 backdrop-blur-sm border border-[#D795B7]/40 px-3.5 py-1 text-[11px] font-medium text-[#E3B8D0] hover:text-[#f7f5f4] hover:border-[#D795B7] transition inline-flex items-center gap-1.5"
                 >
-                  Ver afiche completo
+                  Ver afiche de precios
                 </a>
               </div>
             </div>
@@ -981,7 +983,7 @@ export function renderBookingView(container) {
   const planModalBgOverlay = container.querySelector('#plan-modal-bg-overlay')
   const planModalTitle = container.querySelector('#plan-modal-title')
   const planModalSubtitle = container.querySelector('#plan-modal-subtitle')
-  const planModalShowcaseImg = container.querySelector('#plan-modal-showcase-img')
+  const planModalShowcaseMedia = container.querySelector('#plan-modal-showcase-media')
   const planModalGracePill = container.querySelector('#plan-modal-grace-pill')
   const planModalFlyerLink = container.querySelector('#plan-modal-flyer-link')
   const planModalCardsGrid = container.querySelector('#plan-modal-cards-grid')
@@ -1012,16 +1014,33 @@ export function renderBookingView(container) {
     planModalCardsGrid.innerHTML = plans
       .map((plan) => {
         const isChosen = selectedPlan?.id === plan.id
+        const cardBg = plan.cardImage || cfg.headerImage
         return `
           <div
             data-plan-id="${plan.id}"
-            class="plan-choice-card rounded-2xl p-5 border transition cursor-pointer flex flex-col justify-between ${
+            class="plan-choice-card group relative overflow-hidden rounded-2xl p-5 border transition cursor-pointer flex flex-col justify-between ${
               isChosen
-                ? 'bg-[#1f151a]/95 border-[#D795B7] shadow-[0_0_0_1px_rgba(215,149,183,0.45)]'
-                : 'bg-[#141114]/90 border-[#f7f5f4]/12 hover:border-[#D795B7]/50 hover:bg-[#1f151a]/80'
+                ? 'border-[#D795B7] shadow-[0_0_0_1px_rgba(215,149,183,0.55)]'
+                : 'border-[#f7f5f4]/15 hover:border-[#D795B7]/55'
             }"
           >
-            <div class="space-y-3">
+            <!-- Imagen HD de fondo en cada tarjeta del plan -->
+            <div class="absolute inset-0 pointer-events-none">
+              <img
+                src="${cardBg}"
+                alt="${plan.name}"
+                class="w-full h-full object-cover object-[center_25%] ${
+                  isChosen ? 'opacity-30 scale-105' : 'opacity-20 group-hover:opacity-30 group-hover:scale-105'
+                } transition-all duration-500"
+              />
+              <div class="absolute inset-0 bg-gradient-to-b ${
+                isChosen
+                  ? 'from-[#1f151a]/80 via-[#181115]/88 to-[#120d10]/95'
+                  : 'from-[#141114]/82 via-[#120f12]/90 to-[#0e0b0e]/96'
+              }"></div>
+            </div>
+
+            <div class="relative z-10 space-y-3">
               <div class="flex items-start justify-between gap-2">
                 <div>
                   <span class="text-[10px] uppercase tracking-[0.16em] text-[#E3B8D0] font-semibold block">
@@ -1042,13 +1061,13 @@ export function renderBookingView(container) {
                 </span>
               </div>
 
-              <ul class="space-y-1.5 text-xs text-[#c9a3b1] pt-1 border-t border-[#f7f5f4]/10">
+              <ul class="space-y-1.5 text-xs text-[#c9a3b1] pt-1 border-t border-[#f7f5f4]/12">
                 ${plan.features
                   .map(
                     (feat) => `
                   <li class="flex items-center gap-2">
                     <span class="w-1.5 h-1.5 rounded-full bg-[#D795B7] shrink-0"></span>
-                    <span class="text-[#f7f5f4]/90">${feat}</span>
+                    <span class="text-[#f7f5f4]/95">${feat}</span>
                   </li>
                 `
                   )
@@ -1056,7 +1075,7 @@ export function renderBookingView(container) {
               </ul>
             </div>
 
-            <div class="mt-5 pt-3 border-t border-[#f7f5f4]/10 flex items-end justify-between">
+            <div class="relative z-10 mt-5 pt-3 border-t border-[#f7f5f4]/12 flex items-end justify-between">
               <div>
                 <span class="text-[10px] uppercase tracking-wider text-[#c9a3b1] block">Inversión total</span>
                 <strong class="font-mono-code text-xl text-[#f7f5f4] font-semibold">
@@ -1115,21 +1134,47 @@ export function renderBookingView(container) {
       planModalBgImg.src = cfg.modalBgImage
       planModalBgImg.className = cfg.isFullModalBg
         ? 'w-full h-full object-cover object-center opacity-55 transition-opacity duration-500'
-        : 'w-full h-full object-cover object-center opacity-25 blur-[3px] transition-opacity duration-500'
+        : 'w-full h-full object-cover object-center opacity-30 blur-[2px] transition-opacity duration-500'
     }
     if (planModalBgOverlay) {
       planModalBgOverlay.className = cfg.isFullModalBg
         ? 'absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/55 via-[#141114]/75 to-[#0a0a0a]/95'
-        : 'absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/80 via-[#141114]/88 to-[#0a0a0a]/96'
+        : 'absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/75 via-[#141114]/86 to-[#0a0a0a]/95'
     }
 
-    if (planModalShowcaseImg) {
-      planModalShowcaseImg.src = cfg.headerImage
-      planModalShowcaseImg.className =
-        service.slug === 'foto-navidena'
-          ? 'w-full h-56 sm:h-64 object-cover object-center'
-          : 'w-full h-48 sm:h-56 object-cover object-center'
+    if (planModalShowcaseMedia) {
+      const gallery = Array.isArray(cfg.galleryImages) && cfg.galleryImages.length > 0
+        ? cfg.galleryImages
+        : [cfg.headerImage]
+
+      if (gallery.length >= 2) {
+        planModalShowcaseMedia.innerHTML = `
+          <div class="grid grid-cols-2 gap-1.5 bg-[#0a0a0a]">
+            <img
+              src="${gallery[0]}"
+              alt="${service.name} 1"
+              class="w-full h-56 sm:h-68 object-cover object-[center_20%]"
+            />
+            <img
+              src="${gallery[1]}"
+              alt="${service.name} 2"
+              class="w-full h-56 sm:h-68 object-cover object-[center_20%]"
+            />
+          </div>
+        `
+      } else {
+        planModalShowcaseMedia.innerHTML = `
+          <img
+            src="${gallery[0]}"
+            alt="${service.name}"
+            class="w-full h-56 sm:h-68 object-cover ${
+              service.slug === 'retrato' ? 'object-[center_30%]' : 'object-center'
+            }"
+          />
+        `
+      }
     }
+
     if (planModalGracePill) {
       planModalGracePill.textContent = `+${service.grace_minutes || 25} min de gracia incluidos`
     }
